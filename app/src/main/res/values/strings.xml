@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Foreign Words</string>
+    <string name="action_settings">Settings</string>
+    <string name="section_format">Hello World from section: %1$d</string>
+    <string name="yandex_developer_api_key">056a5493-d6d1-4c2a-ad4b-da4c8388a0bd</string>
+</resources>
