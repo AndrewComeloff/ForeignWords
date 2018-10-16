@@ -12,7 +12,7 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    private val PRIMARY_LANGUAGE = Locale("ru")
+    private val PRIMARY_LANGUAGE = Locale("ru", "RU")
     private val SECONDARY_LANGUAGE = Locale.ENGLISH
 
     private var speaker: Speaker? = null
@@ -28,11 +28,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         cv_card_second_lang.setOnClickListener { view ->
-            speaker!!.say("Hi! I am Alyss", Speaker.Language.SECONDARY)
+            speaker!!.say("I will try to tell you something interesting", Speaker.Language.SECONDARY)
         }
 
         // Initialization speaker
-        speaker = if (false) YandexSpeaker else GoogleSpeaker
+        speaker = if (true) YandexSpeaker else GoogleSpeaker
         speaker!!.init(this, PRIMARY_LANGUAGE, SECONDARY_LANGUAGE)
 
     }

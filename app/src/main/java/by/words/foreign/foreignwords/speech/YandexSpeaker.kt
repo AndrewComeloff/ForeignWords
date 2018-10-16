@@ -11,7 +11,8 @@ object YandexSpeaker : Speaker() {
 
     val TAG: String = "YandexSpeaker"
 
-    private var vocalizer: OnlineVocalizer? = null
+    private var vocalizerPrimary: OnlineVocalizer? = null
+    private var vocalizerSecondary: OnlineVocalizer? = null
     private val vocalizerListener = AssistantVocalizerListener()
 
     override fun init(context: Context, primaryLanguage: Locale, secondaryLanguage: Locale) {
@@ -23,18 +24,33 @@ object YandexSpeaker : Speaker() {
             Toast.makeText(context, "Oops! I cant speak at all.", Toast.LENGTH_SHORT).show()
         }
 
-        vocalizer = OnlineVocalizer.Builder(ru.yandex.speechkit.Language.RUSSIAN, vocalizerListener)
+        vocalizerPrimary = createSpeech(matchLanguage(primaryLanguage))
+        vocalizerSecondary = createSpeech(matchLanguage(secondaryLanguage))
+    }
+
+    private fun matchLanguage(language: Locale): ru.yandex.speechkit.Language {
+        Log.d(TAG, "match ${language.language}")
+        return ru.yandex.speechkit.Language(language.language)
+    }
+
+    private fun createSpeech(language: ru.yandex.speechkit.Language): OnlineVocalizer {
+        val vocalizer = OnlineVocalizer.Builder(language, vocalizerListener)
                 .setEmotion(Emotion.GOOD)
                 .setVoice(Voice.ALYSS)
                 .setAutoPlay(true)
                 .build()
-        vocalizer!!.prepare()
+        vocalizer.prepare()
+        return vocalizer
     }
 
     override fun say(text: String, language: Speaker.Language) {
         Log.d(TAG, "say - $text")
-        if (vocalizer != null) {
-            vocalizer!!.synthesize(text, Vocalizer.TextSynthesizingMode.INTERRUPT)
+        if (vocalizerPrimary != null && vocalizerSecondary != null) {
+            if (language == Language.PRIMARY) {
+                vocalizerPrimary!!.synthesize(text, Vocalizer.TextSynthesizingMode.INTERRUPT)
+            } else {
+                vocalizerSecondary!!.synthesize(text, Vocalizer.TextSynthesizingMode.INTERRUPT)
+            }
         } else {
             throw IllegalAccessException("First of all, you must to initialize the Speaker")
         }
@@ -42,8 +58,9 @@ object YandexSpeaker : Speaker() {
 
     override fun hush() {
         Log.d(TAG, "hush")
-        if (vocalizer != null) {
-            vocalizer!!.cancel()
+        if (vocalizerPrimary != null && vocalizerSecondary != null) {
+            vocalizerPrimary!!.cancel()
+            vocalizerSecondary!!.cancel()
         } else {
             throw IllegalAccessException("First of all, you must to initialize the Speaker")
         }
@@ -51,7 +68,15 @@ object YandexSpeaker : Speaker() {
 
     override fun release() {
         Log.d(TAG, "release")
-        // Nothing to do
+        if (vocalizerPrimary != null && vocalizerSecondary != null) {
+            vocalizerPrimary!!.cancel()
+            vocalizerPrimary!!.destroy()
+            vocalizerPrimary = null
+
+            vocalizerSecondary!!.cancel()
+            vocalizerSecondary!!.destroy()
+            vocalizerSecondary = null
+        }
     }
 
     class AssistantVocalizerListener : VocalizerListener {
