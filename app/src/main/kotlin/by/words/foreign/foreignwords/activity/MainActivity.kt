@@ -23,6 +23,10 @@ class MainActivity : AppCompatActivity() {
 
         setSupportActionBar(toolbar)
 
+        // Initialization speaker
+        speaker = if (false) YandexSpeaker else GoogleSpeaker
+        speaker!!.init(this, PRIMARY_LANGUAGE, SECONDARY_LANGUAGE)
+
         cv_card_prim_lang.setOnClickListener { view ->
             speaker!!.say("Алиса мелафон", Speaker.Language.PRIMARY)
         }
@@ -30,11 +34,6 @@ class MainActivity : AppCompatActivity() {
         cv_card_second_lang.setOnClickListener { view ->
             speaker!!.say("I will try to tell you something interesting", Speaker.Language.SECONDARY)
         }
-
-        // Initialization speaker
-        speaker = if (true) YandexSpeaker else GoogleSpeaker
-        speaker!!.init(this, PRIMARY_LANGUAGE, SECONDARY_LANGUAGE)
-
     }
 
     override fun onDestroy() {

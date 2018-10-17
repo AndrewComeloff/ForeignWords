@@ -6,10 +6,12 @@ import android.widget.Toast
 import by.words.foreign.foreignwords.R
 import ru.yandex.speechkit.*
 import java.util.*
+import ru.yandex.speechkit.Language as YandexLanguage
 
 object YandexSpeaker : Speaker() {
 
-    val TAG: String = "YandexSpeaker"
+    const val MUST_INIT_WARNING = "First of all, you must to initialize the Speaker"
+    const val TAG: String = "YandexSpeaker"
 
     private var vocalizerPrimary: OnlineVocalizer? = null
     private var vocalizerSecondary: OnlineVocalizer? = null
@@ -28,7 +30,7 @@ object YandexSpeaker : Speaker() {
         vocalizerSecondary = createSpeech(matchLanguage(secondaryLanguage))
     }
 
-    private fun matchLanguage(language: Locale): ru.yandex.speechkit.Language {
+    private fun matchLanguage(language: Locale): YandexLanguage {
         Log.d(TAG, "match ${language.language}")
         return ru.yandex.speechkit.Language(language.language)
     }
@@ -45,38 +47,28 @@ object YandexSpeaker : Speaker() {
 
     override fun say(text: String, language: Speaker.Language) {
         Log.d(TAG, "say - $text")
-        if (vocalizerPrimary != null && vocalizerSecondary != null) {
-            if (language == Language.PRIMARY) {
-                vocalizerPrimary!!.synthesize(text, Vocalizer.TextSynthesizingMode.INTERRUPT)
-            } else {
-                vocalizerSecondary!!.synthesize(text, Vocalizer.TextSynthesizingMode.INTERRUPT)
-            }
+        if (language == Language.PRIMARY) {
+            vocalizerPrimary?.synthesize(text, Vocalizer.TextSynthesizingMode.INTERRUPT) ?: throw IllegalAccessException(MUST_INIT_WARNING)
         } else {
-            throw IllegalAccessException("First of all, you must to initialize the Speaker")
+            vocalizerSecondary?.synthesize(text, Vocalizer.TextSynthesizingMode.INTERRUPT) ?: throw IllegalAccessException(MUST_INIT_WARNING)
         }
     }
 
     override fun hush() {
         Log.d(TAG, "hush")
-        if (vocalizerPrimary != null && vocalizerSecondary != null) {
-            vocalizerPrimary!!.cancel()
-            vocalizerSecondary!!.cancel()
-        } else {
-            throw IllegalAccessException("First of all, you must to initialize the Speaker")
-        }
+        vocalizerPrimary?.cancel()
+        vocalizerSecondary?.cancel()
     }
 
     override fun release() {
         Log.d(TAG, "release")
-        if (vocalizerPrimary != null && vocalizerSecondary != null) {
-            vocalizerPrimary!!.cancel()
-            vocalizerPrimary!!.destroy()
-            vocalizerPrimary = null
+        vocalizerPrimary?.cancel()
+        vocalizerPrimary?.destroy()
+        vocalizerPrimary = null
 
-            vocalizerSecondary!!.cancel()
-            vocalizerSecondary!!.destroy()
-            vocalizerSecondary = null
-        }
+        vocalizerSecondary?.cancel()
+        vocalizerSecondary?.destroy()
+        vocalizerSecondary = null
     }
 
     class AssistantVocalizerListener : VocalizerListener {

@@ -8,7 +8,8 @@ import java.util.*
 
 object GoogleSpeaker : Speaker() {
 
-    val TAG: String = "GoogleSpeaker"
+    const val MUST_INIT_WARNING = "First of all, you must to initialize the Speaker"
+    const val TAG: String = "GoogleSpeaker"
 
     private var textToSpeech: TextToSpeech? = null
 
@@ -33,36 +34,29 @@ object GoogleSpeaker : Speaker() {
         return textToSpeech as TextToSpeech
     }
 
+    @Suppress("DEPRECATION")
     override fun say(text: String, language: Speaker.Language) {
         Log.d(TAG, "say - $text on $language")
         textToSpeech!!.language = getLocale(language)
         if (textToSpeech != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                textToSpeech!!.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
+                textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null) ?: throw IllegalAccessException(MUST_INIT_WARNING)
             } else {
-                textToSpeech!!.speak(text, TextToSpeech.QUEUE_FLUSH, null)
+                textToSpeech?.speak(text, TextToSpeech.QUEUE_FLUSH, null) ?: throw IllegalAccessException(MUST_INIT_WARNING)
             }
         } else {
-            throw IllegalAccessException("First of all, you must to initialize the Speaker")
+
         }
     }
 
     override fun hush() {
         Log.d(TAG, "hush")
-        if (textToSpeech != null) {
-            textToSpeech!!.stop()
-        } else {
-            throw IllegalAccessException("First of all, you must to initialize the Speaker")
-        }
+        textToSpeech?.stop()
     }
 
     override fun release() {
-        if (textToSpeech != null) {
-            Log.d(TAG, "release")
-            textToSpeech!!.stop()
-            textToSpeech!!.shutdown()
-        } else {
-            throw IllegalAccessException("First of all, you must to initialize the Speaker")
-        }
+        Log.d(TAG, "release")
+        textToSpeech?.stop()
+        textToSpeech?.shutdown()
     }
 }
