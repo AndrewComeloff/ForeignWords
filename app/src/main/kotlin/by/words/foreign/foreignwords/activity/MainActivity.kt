@@ -6,7 +6,6 @@ import by.words.foreign.foreignwords.R
 import by.words.foreign.foreignwords.speech.GoogleSpeaker
 import by.words.foreign.foreignwords.speech.Speaker
 import by.words.foreign.foreignwords.speech.YandexSpeaker
-import kotlinx.android.synthetic.main.activity_cards.*
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
@@ -21,7 +20,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        setSupportActionBar(toolbar)
+        setSupportActionBar(act_main_toolbar)
 
         // Initialization speaker
         speaker = if (false) YandexSpeaker else GoogleSpeaker
